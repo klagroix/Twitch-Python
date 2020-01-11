@@ -16,11 +16,14 @@ class Resource(BaseResource, Generic[T]):
         self._cursor: Optional[str] = None
 
     def __iter__(self) -> Generator[T, None, None]:
-        # Yield available data
-        if self._data:
-            for entry in self._data:
-                yield entry
-            return
+        # If we can't paginate, just return the data we have
+        if self._can_paginate() is False:
+            if self._data:
+                for entry in self._data:
+                    yield entry
+                return
+            else:
+                return False
 
         # Check if iterator should paginate from api
         if self._can_paginate() is False:

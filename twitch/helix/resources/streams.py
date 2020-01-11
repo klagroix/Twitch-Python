@@ -14,6 +14,9 @@ class Streams(Resource['helix.Stream']):
     def __init__(self, api: API, **kwargs):
         super().__init__(api=api, path='streams')
 
+        # Store kwargs as class property for __iter__
+        self._kwargs = kwargs
+
         response: dict = self._api.get(self._path, params=kwargs)
 
         if response['data']:
@@ -28,7 +31,17 @@ class Streams(Resource['helix.Stream']):
             yield stream, stream.user
 
     def _can_paginate(self) -> bool:
-        return False
+        # print("DEBUGGING - streams.py: _can_paginate")
+        return True
 
     def _handle_pagination_response(self, response: dict) -> List['helix.Stream']:
-        pass
+        """
+        Custom handling for stream pagination
+        :param response: API response data
+        :return: Streams
+        """
+
+        # print("DEBUGGING - streams.py: _handle_pagination_response")
+        streams: List['helix.Stream'] = [helix.Stream(api=self._api, data=stream) for stream in response['data']]
+
+        return streams
