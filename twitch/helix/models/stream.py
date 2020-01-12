@@ -27,3 +27,7 @@ class Stream(Model):
     @property
     def user(self) -> 'helix.User':
         return helix.Users(self._api, int(self.user_id))[0]
+
+    @property
+    def game(self) -> 'helix.Game':
+        return helix.Games(self._api, id=int(self.game_id))[0]
