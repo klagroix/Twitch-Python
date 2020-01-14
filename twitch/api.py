@@ -3,9 +3,11 @@ from datetime import timedelta
 from typing import Dict, Any, Optional
 
 import requests
+import logging
 
 from .cache import Cache
 
+logger = logging.getLogger(__name__)
 
 class API:
     SHARED_CACHE: Cache = Cache()
@@ -65,6 +67,7 @@ class API:
             time_to_sleep: float = min((self.rate_limit_reset - time.time()), 10)
             time_to_sleep = max(time_to_sleep, 1)
 
+            logger.debug("_handle_rate_limit - Sleeping: {0}".format(time_to_sleep))
             time.sleep(time_to_sleep)
 
     def _set_rate_limit(self, response: requests.Response) -> None:
@@ -73,6 +76,7 @@ class API:
             self.rate_limit_points: int = int(response.headers.get('Ratelimit-Limit'))
             self.rate_limit_remaining: int = int(response.headers.get('Ratelimit-Remaining'))
             self.rate_limit_reset: int = int(response.headers.get('Ratelimit-Reset'))
+            logger.debug("Rate limit set. rate_limit_points: {0}, rate_limit_remaining: {1}, rate_limit_reset: {2}".format(self.rate_limit_points, self.rate_limit_remaining, self.rate_limit_reset))
 
     def request(self, method, path: str = '', ignore_cache: bool = False, **kwargs) -> dict:
         url: str = self._url(path=path)
