@@ -3,6 +3,10 @@ from typing import Generator, Tuple, List, Optional
 import twitch.helix as helix
 from twitch.api import API
 from .resource import Resource
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class StreamNotFound(Exception):
@@ -12,6 +16,7 @@ class StreamNotFound(Exception):
 class Streams(Resource['helix.Stream']):
 
     def __init__(self, api: API, ignore_cache: Optional[bool] = False, **kwargs):
+        logger.debug("Streams - entering __init__")
         super().__init__(api=api, path='streams')
 
         # Store kwargs as class property for __iter__
@@ -21,7 +26,7 @@ class Streams(Resource['helix.Stream']):
 
         if response['data']:
             self._data = [helix.Stream(api=self._api, data=video) for video in
-                          self._api.get(self._path, ignore_cache=ignore_cache, params=kwargs)['data']]
+                          response['data']]
         else:
             raise StreamNotFound('No stream was found')
 

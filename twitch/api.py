@@ -85,12 +85,14 @@ class API:
 
         # Cache lookup
         if self.use_cache and not ignore_cache and API.SHARED_CACHE.get(cache_key):
+            logger.debug("Using cache for cache key: {0}".format(cache_key))
             return API.SHARED_CACHE.get(cache_key)
 
         # Check rate limit
         self._handle_rate_limit()
 
         while True:
+            logger.debug("Making request to {0}".format(request.url))
             response = requests.Session().send(request)
             self._set_rate_limit(response)
 

@@ -25,10 +25,6 @@ class Resource(BaseResource, Generic[T]):
             else:
                 return False
 
-        # Check if iterator should paginate from api
-        if self._can_paginate() is False:
-            return
-
         # Remaining elements. Download all if set to None
         remaining: Optional[int] = self._kwargs.get('first', None)
 
