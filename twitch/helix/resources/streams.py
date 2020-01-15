@@ -8,8 +8,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-USE_BEARER = False # helix API doesn't support using bearer for stream data. Need to disable for these API calls
-
 
 class StreamNotFound(Exception):
     pass
@@ -24,7 +22,7 @@ class Streams(Resource['helix.Stream']):
         # Store kwargs as class property for __iter__
         self._kwargs = kwargs
 
-        response: dict = self._api.get(self._path, ignore_cache=ignore_cache, use_bearer=USE_BEARER, params=kwargs)
+        response: dict = self._api.get(self._path, ignore_cache=ignore_cache, params=kwargs)
 
         if response['data']:
             self._data = [helix.Stream(api=self._api, data=video) for video in

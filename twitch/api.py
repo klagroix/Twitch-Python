@@ -44,13 +44,13 @@ class API:
         self.rate_limit_remaining: int = self.rate_limit_points
         self.rate_limit_reset: int = 0
 
-    def _headers(self, use_bearer: bool = True, custom: Dict[str, str] = None) -> Dict[str, str]:
+    def _headers(self, custom: Dict[str, str] = None) -> Dict[str, str]:
         default: Dict[str, str] = {}
 
         if self.client_id:
             default['Client-ID'] = self.client_id
 
-        if self.bearer_token and use_bearer:
+        if self.bearer_token:
             default['Authorization'] = self.bearer_token
 
         return {**default, **custom} if custom else default.copy()
@@ -78,7 +78,7 @@ class API:
             self.rate_limit_reset: int = int(response.headers.get('Ratelimit-Reset'))
             logger.debug("Rate limit set. rate_limit_points: {0}, rate_limit_remaining: {1}, rate_limit_reset: {2}".format(self.rate_limit_points, self.rate_limit_remaining, self.rate_limit_reset))
 
-    def request(self, method, path: str = '', ignore_cache: bool = False, use_bearer: bool = True, **kwargs) -> dict:
+    def request(self, method, path: str = '', ignore_cache: bool = False, **kwargs) -> dict:
         url: str = self._url(path=path)
         request = requests.Request(method, url, **kwargs).prepare()
         cache_key: str = f'{method}:{request.url}'
@@ -113,9 +113,8 @@ class API:
 
     def get(self, path: str, params: Optional[Dict[str, Any]] = None, headers: Optional[Dict[str, Any]] = None,
             ignore_cache: bool = False,
-            use_bearer: bool = True,
             **kwargs) -> dict:
-        return self.request('GET', path, ignore_cache, use_bearer, params=params, headers=self._headers(custom=headers, use_bearer=use_bearer), **kwargs)
+        return self.request('GET', path, ignore_cache, params=params, headers=self._headers(headers), **kwargs)
 
     def post(self):
         pass

@@ -84,7 +84,7 @@ class Resource(BaseResource, Generic[T]):
 
         return elements
 
-    def _next_page(self, ignore_cache: bool = False, use_bearer: bool = True) -> dict:
+    def _next_page(self, ignore_cache: bool = False) -> dict:
         """
         API Pagination
         Get next page from API
@@ -94,7 +94,7 @@ class Resource(BaseResource, Generic[T]):
         # API Response
         self._kwargs['after'] = self._cursor
 
-        response: dict = self._api.get(self._path, params=self._kwargs, ignore_cache=ignore_cache, use_bearer=use_bearer)
+        response: dict = self._api.get(self._path, params=self._kwargs, ignore_cache=ignore_cache)
 
         # Set pagination cursor
         self._cursor = response.get('pagination', {}).get('cursor', None)
