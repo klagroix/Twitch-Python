@@ -39,8 +39,8 @@ class Helix:
                        handle_rate_limit=handle_rate_limit,
                        bearer_token=bearer_token)
 
-    def users(self, *args) -> 'helix.Users':
-        return helix.Users(self.api, *args)
+    def users(self, *args, **kwargs) -> 'helix.Users':
+        return helix.Users(self.api, *args, **kwargs)
 
     def user(self, user: Union[str, int]) -> 'helix.User':
         return self.users(user)[0]
