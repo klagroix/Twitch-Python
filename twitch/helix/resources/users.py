@@ -1,4 +1,4 @@
-from typing import List, Union, Generator, Tuple, Dict
+from typing import List, Union, Generator, Tuple, Dict, Optional
 
 import twitch.helix as helix
 from twitch.api import API
