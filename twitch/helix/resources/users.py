@@ -3,13 +3,19 @@ from typing import List, Union, Generator, Tuple, Dict, Optional
 import twitch.helix as helix
 from twitch.api import API
 from .resource import Resource
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 
 class Users(Resource['helix.User']):
 
-    def __init__(self, api: API, ignore_cache: Optional[bool] = False, *args):
+    def __init__(self, api: API, *args, ignore_cache: bool = False):
         super().__init__(api=api, path='users', ignore_cache=ignore_cache)
 
+        logger.debug("Users - entering __init__")
+        logger.debug("Users args: {0}".format(args))
         # Load data
         users: List[Union[str, int]] = []
         for user in args:
@@ -47,13 +53,12 @@ class Users(Resource['helix.User']):
         # Fetch non-cached users from API
         if len(params['id'] + params['login']):
             for data in self._api.get(self._path, params=params, ignore_cache=self._ignore_cache)['data']:
-
                 # Create and append user)
                 user = helix.User(api=self._api, data=data)
                 self._data.append(user)
 
                 # Save to cache
-                if self._api.use_cache:
+                if self._api.use_cache and not self._ignore_cache:
                     API.SHARED_CACHE.set(f'helix.users.login.{user.login}', data)
                     API.SHARED_CACHE.set(f'helix.users.id.{user.id}', data)
 
