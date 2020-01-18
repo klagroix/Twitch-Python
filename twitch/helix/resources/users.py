@@ -7,8 +7,8 @@ from .resource import Resource
 
 class Users(Resource['helix.User']):
 
-    def __init__(self, api: API, *args):
-        super().__init__(api=api, path='users')
+    def __init__(self, api: API, ignore_cache: Optional[bool] = False, *args):
+        super().__init__(api=api, path='users', ignore_cache=ignore_cache)
 
         # Load data
         users: List[Union[str, int]] = []
@@ -29,7 +29,7 @@ class Users(Resource['helix.User']):
             pass
 
         # Custom user caching
-        if self._api.use_cache:
+        if self._api.use_cache and not self._ignore_cache:
             cache_hits: Dict[str, list] = {'id': [], 'login': []}
             for key, users in tuple(params.items()):
                 for user in users:
@@ -46,7 +46,7 @@ class Users(Resource['helix.User']):
 
         # Fetch non-cached users from API
         if len(params['id'] + params['login']):
-            for data in self._api.get(self._path, params=params, ignore_cache=True)['data']:
+            for data in self._api.get(self._path, params=params, ignore_cache=self._ignore_cache)['data']:
 
                 # Create and append user)
                 user = helix.User(api=self._api, data=data)
