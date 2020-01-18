@@ -11,9 +11,10 @@ T = TypeVar('T')
 
 class Resource(BaseResource, Generic[T]):
 
-    def __init__(self, path: str, api: API, data: Optional[List[T]] = None, **kwargs):
+    def __init__(self, path: str, api: API, data: Optional[List[T]] = None, ignore_cache: bool = False, **kwargs):
         super().__init__(path=path, api=api, data=data, **kwargs)
         self._cursor: Optional[str] = None
+        self._ignore_cache = ignore_cache
 
     def __iter__(self) -> Generator[T, None, None]:
         # If we can't paginate, just return the data we have
@@ -84,7 +85,7 @@ class Resource(BaseResource, Generic[T]):
 
         return elements
 
-    def _next_page(self, ignore_cache: bool = False) -> dict:
+    def _next_page(self) -> dict:
         """
         API Pagination
         Get next page from API
@@ -94,7 +95,7 @@ class Resource(BaseResource, Generic[T]):
         # API Response
         self._kwargs['after'] = self._cursor
 
-        response: dict = self._api.get(self._path, params=self._kwargs, ignore_cache=ignore_cache)
+        response: dict = self._api.get(self._path, params=self._kwargs, ignore_cache=self._ignore_cache)
 
         # Set pagination cursor
         self._cursor = response.get('pagination', {}).get('cursor', None)

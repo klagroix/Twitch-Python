@@ -17,12 +17,12 @@ class Streams(Resource['helix.Stream']):
 
     def __init__(self, api: API, ignore_cache: Optional[bool] = False, **kwargs):
         logger.debug("Streams - entering __init__")
-        super().__init__(api=api, path='streams')
+        super().__init__(api=api, path='streams', ignore_cache=ignore_cache)
 
         # Store kwargs as class property for __iter__
         self._kwargs = kwargs
 
-        response: dict = self._api.get(self._path, ignore_cache=ignore_cache, params=kwargs)
+        response: dict = self._api.get(self._path, ignore_cache=self._ignore_cache, params=kwargs)
 
         if response['data']:
             self._data = [helix.Stream(api=self._api, data=video) for video in
